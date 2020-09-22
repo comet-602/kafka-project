@@ -1,0 +1,62 @@
+1. Downdload and install Kafka 
+
+https://kafka.apache.org/downloads  
+version: Scala 2.12 kafka_2.12-0.10.2.1.tgz
+
+extract it to/home/spark/kafka_2.12-0.10.2.1
+
+cd ~/kafka_2.12-0.10.2.1/
+
+
+2. Start zookeeper in a terminal
+
+bin/zookeeper-server-start.sh config/zookeeper.properties
+
+
+3. Start 3 kafka brokers 
+
+## create 3 broker properties in config folder by copying server.properties
+conifg/server-0.properties
+conifg/server-1.properties
+conifg/server-2.properties 
+
+# modify server-[0-2].properties
+
+# A comma seperated list of directories under which to store log files
+log.dirs=/tmp/kafka-logs-[0-2]
+
+# The id of the broker. This must be set to a unique integer for each broker.
+broker.id=[0-2]
+
+# listeners = PLAINTEXT://your.host.name:9092
+listeners=PLAINTEXT://:909[2-4]
+
+
+## Start brokers in 3 different terminals
+bin/kafka-server-start.sh config/server-0.properties 
+bin/kafka-server-start.sh config/server-1.properties 
+bin/kafka-server-start.sh config/server-2.properties 
+
+
+4. create topic: test_stream
+
+bin/kafka-topics.sh --zookeeper devenv:2181 --create --topic test_stream --partitions 3 --replication-factor 3
+bin/kafka-topics.sh --zookeeper devenv:2181 --describe --topic test_stream
+
+Topic:test_stream	PartitionCount:3	ReplicationFactor:3	Configs:
+	Topic: test_stream	Partition: 0	Leader: 1	Replicas: 1,0,2	Isr: 1,0,2
+	Topic: test_stream	Partition: 1	Leader: 2	Replicas: 2,1,0	Isr: 2,1,0
+	Topic: test_stream	Partition: 2	Leader: 0	Replicas: 0,2,1	Isr: 0,2,1
+
+
+5. test it
+
+bin/kafka-console-producer.sh --broker-list devenv:9092 --topic test_stream
+bin/kafka-console-consumer.sh --zookeeper devenv:2181 --topic test_stream
+
+
+6. install kafka-python
+
+pip install kafka-python
+
+

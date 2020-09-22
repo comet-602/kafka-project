@@ -40,6 +40,7 @@ ipython_genutils = "==0.2.0"
 Pygments = "==2.6.1"
 pyspark = "*"
 hdfs = "*"
+kafka-python = "*"
 
 [requires]
 python_version = "3.7"

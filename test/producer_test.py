@@ -1,7 +1,8 @@
 from confluent_kafka import Producer
 import sys
 import time
-from datetime import datetime
+import datetime
+import random
 
 # 用來接收從Producer instance發出的error訊息
 def error_cb(err):
@@ -13,7 +14,7 @@ if __name__ == '__main__':
     # 步驟1. 設定要連線到Kafka集群的相關設定
     props = {
         # Kafka集群在那裡?
-        'bootstrap.servers': 'localhost:9092',    # <-- 置換成要連接的Kafka集群
+        'bootstrap.servers': '35.229.202.134:9092',    # <-- 置換成要連接的Kafka集群
         'error_cb': error_cb                        # 設定接收error訊息的callback函數
     }
 
@@ -21,20 +22,26 @@ if __name__ == '__main__':
     producer = Producer(props)
 
     # 步驟3. 指定想要發佈訊息的topic名稱
-    topicName = 'testdb'
+    topicName = 'test_stream'
     msgCount = 100000  # 10萬筆
 
     try:
         num=10
         while True:
-            time_now=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            msg='匯入數字為'+str(num)
-            value=str(time_now)+","+str(num)+","+str(msg)
-            print(value)
+
+            dict_show=dict()
+            time_now=datetime.datetime.now()
+            #time_now=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            dict_show['time'] = time_now
+            dict_show['msg']='匯入數字為'+str(num)
+            dict_show['value'] = random.choice(['apple', 'pear', 'peach', 'orange', 'lemon','current','typical','also','explain','Vampires'])
+            print(type(time_now))
+            print(dict_show)
              # produce(topic, [value], [key], [partition], [on_delivery], [timestamp], [headers])
-            producer.produce(topicName,value=bytes(value,encoding="utf8"))
-            time.sleep(1)
-            print(time_now,str(num),msg)
+            producer.produce(topicName,value=bytes(str(dict_show),encoding="utf8"))
+
+            time.sleep(5)
+            
             num+=1
     except BufferError as e:
         # 錯誤處理

@@ -45,27 +45,22 @@ if __name__ == '__main__':
             #設定爬取條件，人名、評論數、喜好數、內文
             statuses = twitter.statuses.user_timeline(screen_name = "@realDonaldTrump",count=tweets_count,tweet_mode='extended')
 
-            created_at=[]
+            dict_list = []
             for data in statuses:
+                dict_twitter=dict()
                 dt_time=datetime.datetime.strptime(data['created_at'].replace('+0000',''),'%a %b %d %H:%M:%S %Y')
-                created_at.append(dt_time)
-            #print(created_at)
-            retweet=[data['retweet_count'] for data in statuses]
-            favorite_count=[data['favorite_count'] for data in statuses]
-            text=[data["full_text"].replace("“","_").replace("’","_") for data in statuses]
+                dict_twitter['created_at'] = dt_time
+                dict_twitter['retweet_count'] = data['retweet_count']
+                dict_twitter['favorite_count'] = data['favorite_count']
+                dict_twitter['text'] = data["full_text"].replace("“","_").replace("’","_")
+                dict_list.append(dict_twitter)
+            print(len(dict_list))
 
-            value=[]
-            value.append(created_at)
-            value.append(retweet)
-            value.append(favorite_count)
-            value.append(text)
-            print(value[0])
-
-            value=str(value)
+            value=str(dict_list)
             
             # produce(topic, [value], [key], [partition], [on_delivery], [timestamp], [headers])
             producer.produce(topicName,value=bytes(value,encoding="utf8"))
-            time.sleep(180)
+            time.sleep(10)
 
     except BufferError as e:
         # 錯誤處理
